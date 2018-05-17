@@ -1,0 +1,48 @@
+body {
+  background: #25273f;
+  font: 14px 'Nunito', sans-serif;
+}
+
+h2 {
+  color: #020246;
+  text-align: center;
+  background-color: #646161;
+  height: 1.5em;
+}
+
+.container {
+  background-color: #bbb8b8;
+  margin: 5em 5em;
+}
+
+.enter-content {
+  display: grid;
+  grid-template-columns: 4fr 1fr;
+  grid-gap: 1em;
+  padding: 1em;
+  grid-auto-rows: 2em;
+}
+
+.task-list {
+  padding: 1em;
+  font-size: 1.5em;
+}
+
+.task-item {
+  margin: 0.5em 0;
+}
+
+.cross {
+  cursor: pointer;
+  color: #ff0000;
+  font-size: 1.5em;
+}
+
+.info {
+  padding: 1em;
+}
+
+input[type="checkbox"] {
+  width: 1.5em;
+  height: 1.5em;
+}
