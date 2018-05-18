@@ -4,35 +4,47 @@ let completed = 0;
 
 function addTask() {
   const newTask = document.getElementById('new-task').value;
+  if (newTask != "") {
+    const newItem = document.createElement("div");
+    newItem.setAttribute("id", total);
+    newItem.setAttribute("class", "task-item");
+    newItem.setAttribute("draggable", "true");
+    newItem.innerHTML = `<input type="checkbox" value="${newTask}" onchange="markItem(${total})"> <label> ${newTask} </label><span class="cross" onclick="removeTask(${total})">&times;</span> <br>`;
 
-  const newItem = document.createElement("div");
-  newItem.setAttribute("id", total);
-  newItem.setAttribute("class", "task-item");
-  newItem.setAttribute("draggable", "true");
-  newItem.innerHTML = `<input type="checkbox" value="${newTask}" onchange="markItem(${total})"> <label> ${newTask} </label><span class="cross" onclick="removeTask(${total})">&times;</span> <br>`;
+    document.getElementById('task-list').appendChild(newItem);
+    total++;
+    count++;
 
-  document.getElementById('task-list').appendChild(newItem);
-  total++;
-  count++;
+    document.getElementById('info').innerHTML = `${count} tasks &nbsp;  ${completed} completed`;
+    document.getElementById('new-task').value = "";
+  } else {
+    window.alert("Enter a task.");
+  }
+}
 
-  document.getElementById('info').innerHTML = `${count} tasks &nbsp;  ${completed} completed`;
-  document.getElementById('new-task').value = "";
+function verifyTask(idNum) {
+  if (document.getElementById(idNum).getElementsByTagName("label")[0].style.textDecoration != "line-through") {
+    return (window.confirm("This task is not completed yet. Are you sure to remove this task? Press OK to delete."));
+  }
+  return true;
 }
 
 function removeTask(idNum) {
-  document.getElementById(idNum).remove();
-  count--;
-  const tasks = document.getElementById("task-list");
-  let temp = 0;
-  let i = 0;
-  while (i < count) {
-    if (tasks.getElementsByTagName("div")[i].getElementsByTagName("input")[0].checked) {
-      temp++;
+  if (verifyTask(idNum)) {
+    document.getElementById(idNum).remove();
+    count--;
+    const tasks = document.getElementById("task-list");
+    let temp = 0;
+    let i = 0;
+    while (i < count) {
+      if (tasks.getElementsByTagName("div")[i].getElementsByTagName("input")[0].checked) {
+        temp++;
+      }
+      i++;
     }
-    i++;
-  }
-  completed = temp;
-  document.getElementById('info').innerHTML = `${count} tasks &nbsp; ${completed} completed`;
+    completed = temp;
+    document.getElementById('info').innerHTML = `${count} tasks &nbsp; ${completed} completed`;
+  };
 }
 
 function markItem(idNum) {
@@ -111,7 +123,10 @@ function handleDragEnd(e) {
   /*[].forEach.call(cols, function (col) {
     col.classList.remove('over');
   });*/
+  refreshMarks(elemListening);
 }
+
+let elemListening;
 
 function addDnDHandlers(elem) {
   elem.addEventListener('dragstart', handleDragStart, false);
@@ -120,6 +135,8 @@ function addDnDHandlers(elem) {
   elem.addEventListener('dragleave', handleDragLeave, false);
   elem.addEventListener('drop', handleDrop, false);
   elem.addEventListener('dragend', handleDragEnd, false);
+
+  elemListening = elem;
 }
 
 // var cols = document.querySelectorAll('#task-list .task-item');
@@ -129,4 +146,11 @@ function addDnDHandlers(elem) {
 function makeDrag() {
   var cols = document.querySelectorAll('#task-list .task-item');
   [].forEach.call(cols, addDnDHandlers);
+}
+
+function refreshMarks(elemListening) {
+  // refactor check boxes
+  if (elemListening.getElementsByTagName("label")[0].style.textDecoration == "line-through") {
+    elemListening.getElementsByTagName("input")[0].setAttribute("checked", true);
+  }
 }
