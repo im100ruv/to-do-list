@@ -89,7 +89,6 @@ function markItem(idNum) {
 }
 
 function decorateCompletedTask(idNum, state) {
-  // const items = document.getElementById("task-list").getElementById(idNum);
   const items = document.getElementById(idNum);
   if (state == 1) {
     items.getElementsByTagName("label")[0].style.textDecoration = "line-through";
@@ -102,15 +101,22 @@ function clearData() {
   user = [];
   updateData();
 }
+
+// =============================================================
+// =============================================
 // ===============================================================
 
 // draggable---------------------------------------------
-var dragSrcEl = null;
+let sourceId = null;
+let destinationId = null;
+
+let dragSrcEl = null;
 
 function handleDragStart(e) {
   // Target (this) element is the source node.
   dragSrcEl = this;
-
+  sourceId = this.id;
+  // console.log("start "+sourceId)
   e.dataTransfer.effectAllowed = 'move';
   e.dataTransfer.setData('text/html', this.outerHTML);
 
@@ -148,10 +154,12 @@ function handleDrop(e) {
     //alert(this.outerHTML);
     //dragSrcEl.innerHTML = this.innerHTML;
     //this.innerHTML = e.dataTransfer.getData('text/html');
+    destinationId = this.id;
+    // console.log("end "+ destinationId);
     this.parentNode.removeChild(dragSrcEl);
-    var dropHTML = e.dataTransfer.getData('text/html');
+    let dropHTML = e.dataTransfer.getData('text/html');
     this.insertAdjacentHTML('beforebegin', dropHTML);
-    var dropElem = this.previousSibling;
+    let dropElem = this.previousSibling;
     addDnDHandlers(dropElem);
 
   }
@@ -166,6 +174,8 @@ function handleDragEnd(e) {
   /*[].forEach.call(cols, function (col) {
     col.classList.remove('over');
   });*/
+  manageAfterDragDrop();
+
   refreshMarks(elemListening);
 }
 
@@ -182,12 +192,8 @@ function addDnDHandlers(elem) {
   elemListening = elem;
 }
 
-// var cols = document.querySelectorAll('#task-list .task-item');
-// [].forEach.call(cols, addDnDHandlers);
-// console.log("asdf" + cols);
-
 function makeDrag() {
-  var cols = document.querySelectorAll('#task-list .task-item');
+  let cols = document.querySelectorAll('#task-list .task-item');
   [].forEach.call(cols, addDnDHandlers);
 }
 
@@ -196,4 +202,24 @@ function refreshMarks(elemListening) {
   if (elemListening.getElementsByTagName("label")[0].style.textDecoration == "line-through") {
     elemListening.getElementsByTagName("input")[0].setAttribute("checked", true);
   }
+}
+
+function manageAfterDragDrop() {
+  console.log(sourceId);
+  console.log(destinationId);
+
+  // first remove source
+  let tempTask = user[sourceId];
+  let temparr = user.concat();
+  let part2 = temparr.splice(sourceId + 1, user.length);
+  let part1 = temparr.splice(0, sourceId);
+  user = part1.concat(part2);
+  updateData();
+
+  // then add source at destination
+  user.splice(destinationId, 0, tempTask);
+  console.log(JSON.stringify(user));
+
+  updateData();
+  console.log(JSON.stringify(user));
 }
