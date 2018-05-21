@@ -10,11 +10,12 @@
 </head>
 
 <body>
+  <input type="button" value="Clear Session" onclick="clearData()">
   <main class="container">
     <h2>Your Milestones of the Day</h2>
     <div class="enter-content">
-      <input id="new-task" name="new-task" class="new-task" type="text" placeholder="enter task" value="">
-      <input class="btn btn-add" type="submit" value="Add" onclick="addTask()">
+      <input id="new-task" name="new-task" class="new-task" type="text" placeholder="enter task" value="" onkeydown="addTask(this)">
+      <!-- <input class="btn btn-add" type="submit" value="Add" onclick="addTask()"> -->
     </div>
 
     <div id="task-list" name="task-list" class="task-list" onmousedown="makeDrag()">
@@ -24,11 +25,6 @@
   </main>
 
   <script src="index.js"></script>
-  <script>
-    if(localStorage){
-      alert("y");
-    }
-  </script>
 </body>
 
 </html>

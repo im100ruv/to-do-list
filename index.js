@@ -1,29 +1,72 @@
-let total = 0;
-let count = 0;
-let completed = 0;
+if (localStorage.getItem("u2") === null) {
+  // json data format
+  let toDoJson = {
+    "users": {
+      "u1": [{}, {}],
 
-function addTask() {
-  const newTask = document.getElementById('new-task').value;
-  if (newTask != "") {
+      "u2": []
+    }
+  }
+  const thisUser = toDoJson.users["u2"];
+  localStorage.setItem('u2', JSON.stringify(thisUser));
+}
+
+
+let user = JSON.parse(localStorage.getItem('u2'));
+displayTasks();
+
+function updateData() {
+  localStorage.setItem('u2', JSON.stringify(user));
+  user = JSON.parse(localStorage.getItem('u2'));
+  displayTasks();
+}
+
+function displayTasks() {
+  let count = user.length;
+  let completed = 0;
+  while (document.getElementById('task-list').firstChild) {
+    document.getElementById('task-list').removeChild(document.getElementById('task-list').firstChild);
+  }
+  for (let i = 0; i < count; i++) {
     const newItem = document.createElement("div");
-    newItem.setAttribute("id", total);
+    newItem.setAttribute("id", i);
+    user[i]["sn"] = i;
     newItem.setAttribute("class", "task-item");
     newItem.setAttribute("draggable", "true");
-    newItem.innerHTML = `<input type="checkbox" value="${newTask}" onchange="markItem(${total})"> <label> ${newTask} </label><span class="cross" onclick="removeTask(${total})">&times;</span> <br>`;
+    newItem.innerHTML = `<input type="checkbox" value="${user[i]["task"]}" onchange="markItem(${i})" ${user[i]["checked"] ? "checked" : ""}> <label> ${user[i]["task"]} </label><span class="cross" onclick="removeTask(${i})">&times;</span> <br>`;
 
     document.getElementById('task-list').appendChild(newItem);
-    total++;
-    count++;
 
-    document.getElementById('info').innerHTML = `${count} tasks &nbsp;  ${completed} completed`;
-    document.getElementById('new-task').value = "";
-  } else {
-    window.alert("Enter a task.");
+    decorateCompletedTask(i, user[i]["checked"]);
+    if (user[i]["checked"]) {
+      completed++;
+    }
+  }
+
+  document.getElementById('info').innerHTML = `${count} tasks &nbsp;  ${completed} completed`;
+  document.getElementById('new-task').value = "";
+}
+
+function addTask(key) {
+  if (event.key === 'Enter') {
+    let count = user.length;
+    const newTask = document.getElementById('new-task').value;
+    if (newTask != "") {
+      let newElem = {
+        "sn": count,
+        "task": newTask,
+        "checked": 0
+      };
+      user.push(newElem);
+      updateData();
+    } else {
+      window.alert("Enter a task.");
+    }
   }
 }
 
 function verifyTask(idNum) {
-  if (document.getElementById(idNum).getElementsByTagName("label")[0].style.textDecoration != "line-through") {
+  if (user[idNum]["checked"] == 0) {
     return (window.confirm("This task is not completed yet. Are you sure to remove this task? Press OK to delete."));
   }
   return true;
@@ -31,35 +74,35 @@ function verifyTask(idNum) {
 
 function removeTask(idNum) {
   if (verifyTask(idNum)) {
-    document.getElementById(idNum).remove();
-    count--;
-    const tasks = document.getElementById("task-list");
-    let temp = 0;
-    let i = 0;
-    while (i < count) {
-      if (tasks.getElementsByTagName("div")[i].getElementsByTagName("input")[0].checked) {
-        temp++;
-      }
-      i++;
-    }
-    completed = temp;
-    document.getElementById('info').innerHTML = `${count} tasks &nbsp; ${completed} completed`;
+    let temparr = user.concat();
+    let part2 = temparr.splice(idNum + 1, user.length);
+    let part1 = temparr.splice(0, idNum);
+    user = part1.concat(part2);
+
+    updateData();
   };
 }
 
 function markItem(idNum) {
-  const item = document.getElementById(idNum);
-  if (item.getElementsByTagName("input")[0].checked) {
-    item.getElementsByTagName("label")[0].style.textDecoration = "line-through";
-    completed++;
-    document.getElementById('info').innerHTML = `${count} tasks &nbsp; ${completed} completed`;
+  (user[idNum]["checked"] == 1) ? user[idNum]["checked"] = 0 : user[idNum]["checked"] = 1;
+  updateData();
+}
+
+function decorateCompletedTask(idNum, state) {
+  // const items = document.getElementById("task-list").getElementById(idNum);
+  const items = document.getElementById(idNum);
+  if (state == 1) {
+    items.getElementsByTagName("label")[0].style.textDecoration = "line-through";
   } else {
-    item.getElementsByTagName("label")[0].style.textDecoration = "none";
-    completed--;
-    document.getElementById('info').innerHTML = `${count} tasks &nbsp;  ${completed} completed`;
+    items.getElementsByTagName("label")[0].style.textDecoration = "none";
   }
 }
 
+function clearData() {
+  user = [];
+  updateData();
+}
+// ===============================================================
 
 // draggable---------------------------------------------
 var dragSrcEl = null;
