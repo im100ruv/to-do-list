@@ -92,8 +92,10 @@ function decorateCompletedTask(idNum, state) {
   const items = document.getElementById(idNum);
   if (state == 1) {
     items.getElementsByTagName("label")[0].style.textDecoration = "line-through";
+    items.getElementsByTagName("label")[0].style.color = "gray";
   } else {
     items.getElementsByTagName("label")[0].style.textDecoration = "none";
+    items.getElementsByTagName("label")[0].style.color = "black";
   }
 }
 
@@ -116,10 +118,8 @@ function handleDragStart(e) {
   // Target (this) element is the source node.
   dragSrcEl = this;
   sourceId = this.id;
-  // console.log("start "+sourceId)
   e.dataTransfer.effectAllowed = 'move';
-  e.dataTransfer.setData('text/html', this.outerHTML);
-
+  // e.dataTransfer.setData('text/html', this.outerHTML);
   this.classList.add('dragElem');
 }
 function handleDragOver(e) {
@@ -127,9 +127,7 @@ function handleDragOver(e) {
     e.preventDefault(); // Necessary. Allows us to drop.
   }
   this.classList.add('over');
-
   e.dataTransfer.dropEffect = 'move';  // See the section on the DataTransfer object.
-
   return false;
 }
 
@@ -143,11 +141,9 @@ function handleDragLeave(e) {
 
 function handleDrop(e) {
   // this/e.target is current target element.
-
   if (e.stopPropagation) {
     e.stopPropagation(); // Stops some browsers from redirecting.
   }
-
   // Don't do anything if dropping the same column we're dragging.
   if (dragSrcEl != this) {
     // Set the source column's HTML to the HTML of the column we dropped on.
@@ -157,11 +153,10 @@ function handleDrop(e) {
     destinationId = this.id;
     // console.log("end "+ destinationId);
     this.parentNode.removeChild(dragSrcEl);
-    let dropHTML = e.dataTransfer.getData('text/html');
-    this.insertAdjacentHTML('beforebegin', dropHTML);
+    // let dropHTML = e.dataTransfer.getData('text/html');
+    // this.insertAdjacentHTML('beforebegin', dropHTML);
     let dropElem = this.previousSibling;
     addDnDHandlers(dropElem);
-
   }
   this.classList.remove('over');
   return false;
@@ -170,16 +165,11 @@ function handleDrop(e) {
 function handleDragEnd(e) {
   // this/e.target is the source node.
   this.classList.remove('over');
-
   /*[].forEach.call(cols, function (col) {
     col.classList.remove('over');
   });*/
   manageAfterDragDrop();
-
-  refreshMarks(elemListening);
 }
-
-let elemListening;
 
 function addDnDHandlers(elem) {
   elem.addEventListener('dragstart', handleDragStart, false);
@@ -188,8 +178,6 @@ function addDnDHandlers(elem) {
   elem.addEventListener('dragleave', handleDragLeave, false);
   elem.addEventListener('drop', handleDrop, false);
   elem.addEventListener('dragend', handleDragEnd, false);
-
-  elemListening = elem;
 }
 
 function makeDrag() {
@@ -197,29 +185,16 @@ function makeDrag() {
   [].forEach.call(cols, addDnDHandlers);
 }
 
-function refreshMarks(elemListening) {
-  // refactor check boxes
-  if (elemListening.getElementsByTagName("label")[0].style.textDecoration == "line-through") {
-    elemListening.getElementsByTagName("input")[0].setAttribute("checked", true);
-  }
-}
-
 function manageAfterDragDrop() {
-  console.log(sourceId);
-  console.log(destinationId);
-
   // first remove source
   let tempTask = user[sourceId];
   let temparr = user.concat();
-  let part2 = temparr.splice(sourceId + 1, user.length);
+  let part2 = temparr.splice(parseInt(sourceId) + 1, user.length);
   let part1 = temparr.splice(0, sourceId);
   user = part1.concat(part2);
   updateData();
 
   // then add source at destination
   user.splice(destinationId, 0, tempTask);
-  console.log(JSON.stringify(user));
-
   updateData();
-  console.log(JSON.stringify(user));
 }
