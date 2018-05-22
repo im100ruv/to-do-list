@@ -47,8 +47,13 @@ function displayTasks() {
     }
   }
   
-  completed ? document.getElementById('info').innerHTML = `${count} tasks &nbsp;  ${completed} completed 
-  <input id="remove-completed" type="button" value="Remove Completed" onclick="removeCompleted()">` : "";
+  // completed ? document.getElementById('info').innerHTML = `${count} tasks &nbsp;  ${completed} completed 
+  // <input id="remove-completed" type="button" value="Remove Completed" onclick="removeCompleted()">` : "";
+  const tempTask = completed ? `${count} tasks &nbsp;  ${completed} completed 
+  <input id="remove-completed" type="button" value="Remove Completed" onclick="removeCompleted()">` : `${count} tasks`;
+  document.getElementById('info').innerHTML = count ? tempTask : "";
+  // document.getElementById('info').innerHTML = `${count} tasks &nbsp;  ${completed} completed 
+  // <input id="remove-completed" type="button" value="Remove Completed" onclick="removeCompleted()">`;
   document.getElementById('new-task').value = "";
 }
 
