@@ -24,6 +24,10 @@ function updateData() {
 function displayTasks() {
   let count = user.length;
   let completed = 0;
+
+  count ? document.getElementById('mark-all').removeAttribute("hidden") : document.getElementById('mark-all').setAttribute("hidden","");
+  
+
   while (document.getElementById('task-list').firstChild) {
     document.getElementById('task-list').removeChild(document.getElementById('task-list').firstChild);
   }
@@ -42,8 +46,9 @@ function displayTasks() {
       completed++;
     }
   }
-
-  document.getElementById('info').innerHTML = `${count} tasks &nbsp;  ${completed} completed`;
+  
+  completed ? document.getElementById('info').innerHTML = `${count} tasks &nbsp;  ${completed} completed 
+  <input id="remove-completed" type="button" value="Remove Completed" onclick="removeCompleted()">` : "";
   document.getElementById('new-task').value = "";
 }
 
@@ -101,6 +106,33 @@ function decorateCompletedTask(idNum, state) {
 
 function clearData() {
   user = [];
+  updateData();
+}
+
+function markAll() {
+  // document.getElementById('task-list').getElementsByClassName('task-item').forEach.getElementsByTagName('input')[0].checked;
+  if (document.getElementById('mark-all').value === "Mark All") {
+    for (const item in user) {
+      user[item]["checked"] = 1;
+    }
+    document.getElementById('mark-all').value = "Unmark All";
+  } else if (document.getElementById('mark-all').value === "Unmark All") {
+    for (const item in user) {
+      user[item]["checked"] = 0;
+    }
+    document.getElementById('mark-all').value = "Mark All";
+  }
+  updateData();
+}
+
+function removeCompleted() {
+  let newArr = [];
+  for (const item in user) {
+    if (user[item]["checked"] == 0) {
+      newArr.push(user[item]);
+    }
+  }
+  user = newArr;
   updateData();
 }
 
