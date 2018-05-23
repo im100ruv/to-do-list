@@ -49,6 +49,10 @@ label {
   margin: 1em;
 }
 
+.cross:hover {
+  color: #f15858;
+}
+
 .info {
   padding: 1em;
 }

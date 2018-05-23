@@ -25,42 +25,38 @@ function displayTasks() {
   let count = user.length;
   let completed = 0;
 
-  count ? document.getElementById('mark-all').removeAttribute("hidden") : document.getElementById('mark-all').setAttribute("hidden","");
-  
+  count ? $('#mark-all').removeAttr('hidden') : $('#mark-all').attr("hidden", "");
 
-  while (document.getElementById('task-list').firstChild) {
-    document.getElementById('task-list').removeChild(document.getElementById('task-list').firstChild);
-  }
+  $('#task-list').empty();
+
   for (let i = 0; i < count; i++) {
+    user[i]["sn"] = i;
+
     const newItem = document.createElement("div");
     newItem.setAttribute("id", i);
-    user[i]["sn"] = i;
     newItem.setAttribute("class", "task-item");
     newItem.setAttribute("draggable", "true");
-    newItem.innerHTML = `<input type="checkbox" value="${user[i]["task"]}" onchange="markItem(${i})" ${user[i]["checked"] ? "checked" : ""}> <label> ${user[i]["task"]} </label><span class="cross" onclick="removeTask(${i})">&times;</span> <br>`;
+    newItem.innerHTML = `<input type="checkbox" value="${user[i]["task"]}" ${user[i]["checked"] ? "checked" : ""}> <label> ${user[i]["task"]} </label><span class="cross">&times;</span> <br>`;
 
-    document.getElementById('task-list').appendChild(newItem);
+    $('#task-list').append(newItem);
 
     decorateCompletedTask(i, user[i]["checked"]);
     if (user[i]["checked"]) {
       completed++;
     }
   }
-  
-  // completed ? document.getElementById('info').innerHTML = `${count} tasks &nbsp;  ${completed} completed 
-  // <input id="remove-completed" type="button" value="Remove Completed" onclick="removeCompleted()">` : "";
+
   const tempTask = completed ? `${count} tasks &nbsp;  ${completed} completed 
-  <input id="remove-completed" type="button" value="Remove Completed" onclick="removeCompleted()">` : `${count} tasks`;
-  document.getElementById('info').innerHTML = count ? tempTask : "";
-  // document.getElementById('info').innerHTML = `${count} tasks &nbsp;  ${completed} completed 
-  // <input id="remove-completed" type="button" value="Remove Completed" onclick="removeCompleted()">`;
-  document.getElementById('new-task').value = "";
+  <input id="remove-completed" type="button" value="Remove Completed">` : `${count} tasks`;
+
+  $('#info').html(count ? tempTask : "");
 }
 
-function addTask(key) {
+// adding new task
+$('#new-task').keydown(function (event) {
   if (event.key === 'Enter') {
     let count = user.length;
-    const newTask = document.getElementById('new-task').value;
+    const newTask = $("#new-task").val();   //or use   $("input:text").val("");
     if (newTask != "") {
       let newElem = {
         "sn": count,
@@ -68,12 +64,13 @@ function addTask(key) {
         "checked": 0
       };
       user.push(newElem);
+      $("#new-task").val("");    //or use   $("input:text").val("");
       updateData();
     } else {
       window.alert("Enter a task.");
     }
   }
-}
+});
 
 function verifyTask(idNum) {
   if (user[idNum]["checked"] == 0) {
@@ -82,55 +79,57 @@ function verifyTask(idNum) {
   return true;
 }
 
-function removeTask(idNum) {
+$('.task-list').on('click', 'span.cross', function () {
+  const idNum = this.parentNode.id;
   if (verifyTask(idNum)) {
     let temparr = user.concat();
-    let part2 = temparr.splice(idNum + 1, user.length);
+    let part2 = temparr.splice(parseInt(idNum) + 1, user.length);
     let part1 = temparr.splice(0, idNum);
     user = part1.concat(part2);
 
     updateData();
   };
-}
+});
 
-function markItem(idNum) {
+$('.task-list').on('change', 'input', function () {
+  const idNum = this.parentNode.id;
   (user[idNum]["checked"] == 1) ? user[idNum]["checked"] = 0 : user[idNum]["checked"] = 1;
   updateData();
-}
+});
 
 function decorateCompletedTask(idNum, state) {
-  const items = document.getElementById(idNum);
+  const items = $('#'+idNum);
   if (state == 1) {
-    items.getElementsByTagName("label")[0].style.textDecoration = "line-through";
-    items.getElementsByTagName("label")[0].style.color = "gray";
+    items.children('label').css('textDecoration', 'line-through');
+    items.children('label').css('color', 'gray');
   } else {
-    items.getElementsByTagName("label")[0].style.textDecoration = "none";
-    items.getElementsByTagName("label")[0].style.color = "black";
+    items.children('label').css('textDecoration', 'none');
+    items.children('label').css('color', 'black');
   }
 }
 
-function clearData() {
+$('#clear-session').click(function () {
   user = [];
   updateData();
-}
+});
 
-function markAll() {
+$('#mark-all').click(function () {
   // document.getElementById('task-list').getElementsByClassName('task-item').forEach.getElementsByTagName('input')[0].checked;
-  if (document.getElementById('mark-all').value === "Mark All") {
+  if ($('#mark-all').val() === "Mark All") {
     for (const item in user) {
       user[item]["checked"] = 1;
     }
-    document.getElementById('mark-all').value = "Unmark All";
-  } else if (document.getElementById('mark-all').value === "Unmark All") {
+    $('#mark-all').val("Unmark All");
+  } else if ($('#mark-all').val() === "Unmark All") {
     for (const item in user) {
       user[item]["checked"] = 0;
     }
-    document.getElementById('mark-all').value = "Mark All";
+    $('#mark-all').val("Mark All");
   }
   updateData();
-}
+});
 
-function removeCompleted() {
+$('body').on('click', '#remove-completed', function () {
   let newArr = [];
   for (const item in user) {
     if (user[item]["checked"] == 0) {
@@ -139,7 +138,7 @@ function removeCompleted() {
   }
   user = newArr;
   updateData();
-}
+});
 
 // =============================================================
 // =============================================

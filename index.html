@@ -10,19 +10,20 @@
 </head>
 
 <body>
-  <input type="button" value="Clear Session" onclick="clearData()">
+  <input id="clear-session" type="button" value="Clear Session">
   <main class="container">
     <h2>Your Milestones of the Day</h2>
     <div class="enter-content">
-      <input id="new-task" name="new-task" class="new-task" type="text" placeholder="enter task" value="" onkeydown="addTask(this)">
+      <input id="new-task" name="new-task" class="new-task" type="text" placeholder="enter task" value="">
     </div>
-    <input id="mark-all" type="button" value="Mark All" onclick="markAll()">
+    <input id="mark-all" type="button" value="Mark All">
     <div id="task-list" name="task-list" class="task-list" onmousedown="makeDrag()">
     </div>
 
     <div id="info" class="info"></div>
   </main>
 
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
   <script src="index.js"></script>
 </body>
 
