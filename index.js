@@ -1,56 +1,51 @@
-if (localStorage.getItem("u2") === null) {
-  // json data format
-  let toDoJson = {
-    "users": {
-      "u1": [{}, {}],
+// json data format
+let toDoJson = {
+  "users": {
+    "u1": [{}, {}],
 
-      "u2": []
-    }
+    "u2": []
   }
-  const thisUser = toDoJson.users["u2"];
-  localStorage.setItem('u2', JSON.stringify(thisUser));
 }
 
+let sourceId = null;
+let sourceElem = null;
+let destinationId = null;
 
-let user = JSON.parse(localStorage.getItem('u2'));
-displayTasks();
+$('.task-list').on('click', 'span.cross', function () {
+  const idNum = this.parentNode.id;
+  if (verifyTask(idNum)) {
+    let temparr = user.concat();
+    let part2 = temparr.splice(parseInt(idNum) + 1, user.length);
+    let part1 = temparr.splice(0, idNum);
+    user = part1.concat(part2);
 
-function updateData() {
-  localStorage.setItem('u2', JSON.stringify(user));
-  user = JSON.parse(localStorage.getItem('u2'));
-  displayTasks();
-}
+    updateData();
+  };
+});
 
-function displayTasks() {
-  let count = user.length;
-  let completed = 0;
+$('.task-list').on('change', 'input', function () {
+  const idNum = this.parentNode.id;
+  (user[idNum]["checked"] == 1) ? user[idNum]["checked"] = 0 : user[idNum]["checked"] = 1;
+  updateData();
+});
 
-  count ? $('#mark-all').removeAttr('hidden') : $('#mark-all').attr("hidden", "");
-
-  $('#task-list').empty();
-
-  for (let i = 0; i < count; i++) {
-    user[i]["sn"] = i;
-
-    const newItem = document.createElement("div");
-    newItem.setAttribute("id", i);
-    newItem.setAttribute("class", "task-item");
-    newItem.setAttribute("draggable", "true");
-    newItem.innerHTML = `<input type="checkbox" value="${user[i]["task"]}" ${user[i]["checked"] ? "checked" : ""}> <label> ${user[i]["task"]} </label><span class="cross">&times;</span> <br>`;
-
-    $('#task-list').append(newItem);
-
-    decorateCompletedTask(i, user[i]["checked"]);
-    if (user[i]["checked"]) {
-      completed++;
+$("[contenteditable='true']").each(function () {
+  var id = $(this).attr("id");
+  $(this).bind('focus', function () {
+    // store the original value of element first time it gets focus
+    if (!(id in clicked)) {
+      clicked[id] = $(this).html()
     }
+  });
+});
+
+$('.task-list').on('keydown', "[contenteditable='true']", function (event) {
+  if (event.key === 'Enter') {
+    const idNum = this.parentNode.id;
+    user[idNum]["task"] = $(this).text();
+    updateData();
   }
-
-  const tempTask = completed ? `${count} tasks &nbsp;  ${completed} completed 
-  <input id="remove-completed" type="button" value="Remove Completed">` : `${count} tasks`;
-
-  $('#info').html(count ? tempTask : "");
-}
+});
 
 // adding new task
 $('#new-task').keydown(function (event) {
@@ -71,42 +66,6 @@ $('#new-task').keydown(function (event) {
     }
   }
 });
-
-function verifyTask(idNum) {
-  if (user[idNum]["checked"] == 0) {
-    return (window.confirm("This task is not completed yet. Are you sure to remove this task? Press OK to delete."));
-  }
-  return true;
-}
-
-$('.task-list').on('click', 'span.cross', function () {
-  const idNum = this.parentNode.id;
-  if (verifyTask(idNum)) {
-    let temparr = user.concat();
-    let part2 = temparr.splice(parseInt(idNum) + 1, user.length);
-    let part1 = temparr.splice(0, idNum);
-    user = part1.concat(part2);
-
-    updateData();
-  };
-});
-
-$('.task-list').on('change', 'input', function () {
-  const idNum = this.parentNode.id;
-  (user[idNum]["checked"] == 1) ? user[idNum]["checked"] = 0 : user[idNum]["checked"] = 1;
-  updateData();
-});
-
-function decorateCompletedTask(idNum, state) {
-  const items = $('#'+idNum);
-  if (state == 1) {
-    items.children('label').css('textDecoration', 'line-through');
-    items.children('label').css('color', 'gray');
-  } else {
-    items.children('label').css('textDecoration', 'none');
-    items.children('label').css('color', 'black');
-  }
-}
 
 $('#clear-session').click(function () {
   user = [];
@@ -140,30 +99,71 @@ $('body').on('click', '#remove-completed', function () {
   updateData();
 });
 
-// =============================================================
-// =============================================
-// ===============================================================
+function updateData() {
+  toDoJson.users['u2'] = user;
+  localStorage.setItem('toDoJson', JSON.stringify(toDoJson));
+  toDoJson = JSON.parse(localStorage.getItem('toDoJson'));
+  user = toDoJson.users["u2"];
+  displayTasks();
+}
 
-// draggable---------------------------------------------
-let sourceId = null;
-let destinationId = null;
+function displayTasks() {
+  let count = user.length;
+  let completed = 0;
 
-let dragSrcEl = null;
+  count ? $('#mark-all').removeAttr('hidden') : $('#mark-all').attr("hidden", "");
+
+  $('#task-list').empty();
+
+  for (let i = 0; i < count; i++) {
+    user[i]["sn"] = i;
+
+    const newItem = document.createElement("div");
+    newItem.setAttribute("id", i);
+    newItem.setAttribute("class", "task-item");
+    newItem.setAttribute("draggable", "true");
+    newItem.innerHTML = `<input type="checkbox" value="${user[i]["task"]}" ${user[i]["checked"] ? "checked" : ""}> <label contenteditable="true"> ${user[i]["task"]} </label><span class="cross">&times;</span> <br>`;
+
+    $('#task-list').append(newItem);
+
+    decorateCompletedTask(i, user[i]["checked"]);
+    if (user[i]["checked"]) {
+      completed++;
+    }
+  }
+
+  const tempTask = completed ? `${count} tasks &nbsp;  ${completed} completed 
+  <input id="remove-completed" type="button" value="Remove Completed">` : `${count} tasks`;
+
+  $('#info').html(count ? tempTask : "");
+}
+
+function verifyTask(idNum) {
+  if (user[idNum]["checked"] == 0) {
+    return (window.confirm("This task is not completed yet. Are you sure to remove this task? Press OK to delete."));
+  }
+  return true;
+}
+
+function decorateCompletedTask(idNum, state) {
+  const items = $('#' + idNum);
+  if (state == 1) {
+    items.children('label').css('textDecoration', 'line-through');
+    items.children('label').css('color', 'gray');
+  } else {
+    items.children('label').css('textDecoration', 'none');
+    items.children('label').css('color', 'black');
+  }
+}
 
 function handleDragStart(e) {
-  // Target (this) element is the source node.
-  dragSrcEl = this;
+  sourceElem = this;
   sourceId = this.id;
-  e.dataTransfer.effectAllowed = 'move';
-  // e.dataTransfer.setData('text/html', this.outerHTML);
   this.classList.add('dragElem');
 }
 function handleDragOver(e) {
-  if (e.preventDefault) {
-    e.preventDefault(); // Necessary. Allows us to drop.
-  }
+  e.preventDefault(); // Necessary. Allows us to drop.
   this.classList.add('over');
-  e.dataTransfer.dropEffect = 'move';  // See the section on the DataTransfer object.
   return false;
 }
 
@@ -177,22 +177,10 @@ function handleDragLeave(e) {
 
 function handleDrop(e) {
   // this/e.target is current target element.
-  if (e.stopPropagation) {
-    e.stopPropagation(); // Stops some browsers from redirecting.
-  }
+  e.stopPropagation(); // Stops some browsers from redirecting.
   // Don't do anything if dropping the same column we're dragging.
-  if (dragSrcEl != this) {
-    // Set the source column's HTML to the HTML of the column we dropped on.
-    //alert(this.outerHTML);
-    //dragSrcEl.innerHTML = this.innerHTML;
-    //this.innerHTML = e.dataTransfer.getData('text/html');
+  if (sourceElem != this) {
     destinationId = this.id;
-    // console.log("end "+ destinationId);
-    this.parentNode.removeChild(dragSrcEl);
-    // let dropHTML = e.dataTransfer.getData('text/html');
-    // this.insertAdjacentHTML('beforebegin', dropHTML);
-    let dropElem = this.previousSibling;
-    addDnDHandlers(dropElem);
   }
   this.classList.remove('over');
   return false;
@@ -201,9 +189,6 @@ function handleDrop(e) {
 function handleDragEnd(e) {
   // this/e.target is the source node.
   this.classList.remove('over');
-  /*[].forEach.call(cols, function (col) {
-    col.classList.remove('over');
-  });*/
   manageAfterDragDrop();
 }
 
@@ -234,3 +219,11 @@ function manageAfterDragDrop() {
   user.splice(destinationId, 0, tempTask);
   updateData();
 }
+
+if (localStorage.getItem("toDoJson") === null) {
+  localStorage.setItem('toDoJson', JSON.stringify(toDoJson));
+}
+
+toDoJson = JSON.parse(localStorage.getItem('toDoJson'));
+let user = toDoJson.users["u2"];
+displayTasks();
