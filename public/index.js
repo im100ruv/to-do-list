@@ -1,12 +1,11 @@
 // json data format
 let toDoJson = {
   "users": {
-    "u1": [{}, {}],
-
-    "u2": []
+    "u1": []
   }
 }
 
+let user = toDoJson.users["u1"];
 let sourceId = null;
 let sourceElem = null;
 let destinationId = null;
@@ -69,7 +68,14 @@ $('#new-task').keydown(function (event) {
 
 $('#clear-session').click(function () {
   user = [];
-  updateData();
+  toDoJson.users['u1'] = user;
+  $.get("/demotest", {"data":"remove"}, function (result) {
+    if (Object.keys(result).length != 0) {
+      toDoJson.users = result[0];
+      user = toDoJson.users["u1"];
+    }
+  });
+  displayTasks();
 });
 
 $('#mark-all').click(function () {
@@ -100,10 +106,13 @@ $('body').on('click', '#remove-completed', function () {
 });
 
 function updateData() {
-  toDoJson.users['u2'] = user;
-  localStorage.setItem('toDoJson', JSON.stringify(toDoJson));
-  toDoJson = JSON.parse(localStorage.getItem('toDoJson'));
-  user = toDoJson.users["u2"];
+  toDoJson.users['u1'] = user;
+  $.get("/demotest", toDoJson.users, function (result) {
+    if (Object.keys(result).length != 0) {
+      toDoJson.users = result[0];
+      user = toDoJson.users["u1"];
+    }
+  });
   displayTasks();
 }
 
@@ -220,10 +229,20 @@ function manageAfterDragDrop() {
   updateData();
 }
 
-if (localStorage.getItem("toDoJson") === null) {
-  localStorage.setItem('toDoJson', JSON.stringify(toDoJson));
-}
+$.get("/demotest", toDoJson.users, function (result) {
+  if (Object.keys(result).length != 0) {
+    toDoJson.users = result[0];
+    user = toDoJson.users["u1"];
+  }
+  displayTasks();
+});
 
-toDoJson = JSON.parse(localStorage.getItem('toDoJson'));
-let user = toDoJson.users["u2"];
-displayTasks();
+
+// $.ajax({
+//   method: "GET",
+//   url: '/demotest',
+//   data: toDoJson,
+//   success: function(result){
+//     console.log(result)
+//   }
+// })
