@@ -69,7 +69,7 @@ $('#new-task').keydown(function (event) {
 $('#clear-session').click(function () {
   user = [];
   toDoJson.users['u1'] = user;
-  $.get("/demotest", {"data":"remove"}, function (result) {
+  $.get("/demotest", { "data": "remove" }, function (result) {
     if (Object.keys(result).length != 0) {
       toDoJson.users = result[0];
       user = toDoJson.users["u1"];
@@ -81,14 +81,14 @@ $('#clear-session').click(function () {
 $('#mark-all').click(function () {
   // document.getElementById('task-list').getElementsByClassName('task-item').forEach.getElementsByTagName('input')[0].checked;
   if ($('#mark-all').val() === "Mark All") {
-    for (const item in user) {
-      user[item]["checked"] = 1;
-    }
+    user.forEach(elem => {
+      elem["checked"] = 1;
+    });
     $('#mark-all').val("Unmark All");
   } else if ($('#mark-all').val() === "Unmark All") {
-    for (const item in user) {
-      user[item]["checked"] = 0;
-    }
+    user.forEach(elem => {
+      elem["checked"] = 0;
+    });
     $('#mark-all').val("Mark All");
   }
   updateData();
@@ -96,11 +96,11 @@ $('#mark-all').click(function () {
 
 $('body').on('click', '#remove-completed', function () {
   let newArr = [];
-  for (const item in user) {
-    if (user[item]["checked"] == 0) {
-      newArr.push(user[item]);
+  user.forEach(elem => {
+    if (elem["checked"] == 0) {
+      newArr.push(elem);
     }
-  }
+  });
   user = newArr;
   updateData();
 });
@@ -246,3 +246,4 @@ $.get("/demotest", toDoJson.users, function (result) {
 //     console.log(result)
 //   }
 // })
+

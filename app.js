@@ -51,7 +51,6 @@ app.get('/demotest', function (req, res) {
           console.log("error while inserting!");
           res.send(err);
         } else {
-          console.log("success!");
           DataJson.find(function (err, result) {
             res.send(result);
           });
@@ -62,4 +61,4 @@ app.get('/demotest', function (req, res) {
   }
 });
 
-app.listen(8082);
+app.listen(8081);

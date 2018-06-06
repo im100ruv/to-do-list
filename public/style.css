@@ -13,6 +13,7 @@ h2 {
 label {
   margin: 1em;
   word-wrap: break-word;
+  width: 70%;
 }
 
 [type= button] {
@@ -35,9 +36,14 @@ label {
 .task-list {
   padding: 1em;
   font-size: 1.5em;
+  height: 300px;
+  overflow: auto;
 }
 
 .task-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
   margin: 0.5em 0;
   border: 1px solid red;
 }
@@ -46,7 +52,6 @@ label {
   cursor: pointer;
   color: #ff0000;
   font-size: 1.5em;
-  margin: 1em;
 }
 
 .cross:hover {
