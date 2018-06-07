@@ -28,12 +28,12 @@ app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }))
 app.use(express.static('public'));
 
-app.get('/demotest', function (req, res) {
-  if (Object.keys(req.query).length === 0) {
+app.post('/demotest', function (req, res) {
+  if (Object.keys(req.body).length === 0) {
     // fetch from database
     DataJson.find(function (err, result) {
       if(result[0].u1.length === 0) {
-        res.send(req.query)
+        res.send(req.body)
       } else {
         res.send(result);
       }
@@ -44,7 +44,7 @@ app.get('/demotest', function (req, res) {
       if(req.query.data == "remove"){
         jsonData = new DataJson({"u1":[]});
       } else {
-        jsonData = new DataJson(req.query);
+        jsonData = new DataJson(req.body);
       }
       jsonData.save(function (err, result) {
         if (err) {
@@ -61,4 +61,6 @@ app.get('/demotest', function (req, res) {
   }
 });
 
-app.listen(8081);
+app.listen(8081, () => {
+  console.log("server listening on: http://localhost:8081");
+});
