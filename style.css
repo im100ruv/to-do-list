@@ -3,7 +3,7 @@ body {
   font: 14px 'Nunito', sans-serif;
 }
 
-h2 {
+h1 {
   color: #020246;
   text-align: center;
   background-color: #646161;
@@ -13,6 +13,7 @@ h2 {
 label {
   margin: 1em;
   word-wrap: break-word;
+  width: 70%;
 }
 
 [type= button] {
@@ -21,7 +22,7 @@ label {
 
 .container {
   background-color: #bbb8b8;
-  margin: 5em 20em;
+  margin: 3.4em 20em;
 }
 
 .enter-content {
@@ -38,15 +39,22 @@ label {
 }
 
 .task-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
   margin: 0.5em 0;
-  border: 1px solid red;
+  border: 2px solid #1b1b9494;
+  border-radius: 10px;
 }
 
 .cross {
   cursor: pointer;
-  color: #ff0000;
+  color: #880202;
   font-size: 1.5em;
-  margin: 1em;
+}
+
+.cross:hover {
+  color: #f84848;
 }
 
 .info {

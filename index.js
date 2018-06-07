@@ -13,7 +13,6 @@ if (localStorage.getItem("u2") === null) {
   localStorage.setItem('u2', JSON.stringify(thisUser));
 }
 
-
 let user = JSON.parse(localStorage.getItem('u2'));
 displayTasks();
 
